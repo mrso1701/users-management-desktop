@@ -8,9 +8,9 @@ import java.sql.SQLException;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public  class DatabaseConnectionFactory {
+public class DatabaseConnectionFactory {
 
-  public  Connection createConnection(final DatabaseConfig config) {
+  public Connection createConnection(final DatabaseConfig config) {
     try {
       return DriverManager.getConnection(
           config.buildJdbcUrl(), config.username(), config.password());
