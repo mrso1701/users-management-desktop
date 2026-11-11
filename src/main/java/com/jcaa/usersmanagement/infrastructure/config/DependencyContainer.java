@@ -1,5 +1,7 @@
 package com.jcaa.usersmanagement.infrastructure.config;
 
+import java.sql.Connection;
+
 import com.jcaa.usersmanagement.application.port.in.CreateUserUseCase;
 import com.jcaa.usersmanagement.application.port.in.CreateVehiculoUseCase;
 import com.jcaa.usersmanagement.application.port.in.DeleteUserUseCase;
@@ -29,12 +31,11 @@ import com.jcaa.usersmanagement.infrastructure.adapter.persistence.config.Databa
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.repository.PostgresVehiculoRepositoryAdapter;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.repository.UserRepositoryMySQL;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.UserController;
+import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.VehiculoController;
 
-import java.sql.Connection;
 import jakarta.validation.Validator;
 
 public final class DependencyContainer {
-
     private static final String DB_HOST = "db.host";
     private static final String DB_PORT = "db.port";
     private static final String DB_NAME = "db.name";
@@ -49,22 +50,29 @@ public final class DependencyContainer {
     private static final String SMTP_FROM_NAME = "smtp.from.name";
     private DatabaseConfig connection;
 
-    final PostgresVehiculoRepositoryAdapter vehiculoRepository = new PostgresVehiculoRepositoryAdapter(connection);
-
-    // Servicios de Vehículo
-    final CreateVehiculoUseCase createVehiculoUseCase = new CreateVehiculoService(vehiculoRepository,
-            vehiculoRepository);
-    final GetVehiculoByVinUseCase getVehiculoByVinUseCase = new GetVehiculoService(vehiculoRepository,
-            vehiculoRepository);
-    final GetAllVehiculosUseCase getAllVehiculosUseCase = new GetVehiculoService(vehiculoRepository,
-            vehiculoRepository);
-    final UpdateVehiculoUseCase updateVehiculoUseCase = new UpdateVehiculoService(vehiculoRepository,
-            vehiculoRepository);
-    final DeleteVehiculoUseCase deleteVehiculoUseCase = new DeleteVehiculoService(vehiculoRepository);
+    private final VehiculoController vehiculoController;
 
     private final UserController userController;
 
     public DependencyContainer() {
+        final PostgresVehiculoRepositoryAdapter vehiculoRepository = 
+                new PostgresVehiculoRepositoryAdapter(connection);
+
+        final CreateVehiculoUseCase createVehiculoUseCase = new CreateVehiculoService(vehiculoRepository, vehiculoRepository);
+        final GetVehiculoByVinUseCase getVehiculoByVinUseCase = new GetVehiculoService(vehiculoRepository, vehiculoRepository);
+        final GetAllVehiculosUseCase getAllVehiculosUseCase = new GetVehiculoService(vehiculoRepository, vehiculoRepository);
+        final UpdateVehiculoUseCase updateVehiculoUseCase = new UpdateVehiculoService(vehiculoRepository, vehiculoRepository);
+        final DeleteVehiculoUseCase deleteVehiculoUseCase = new DeleteVehiculoService(vehiculoRepository);
+
+        this.vehiculoController = new VehiculoController(
+                createVehiculoUseCase,
+                getVehiculoByVinUseCase,
+                getAllVehiculosUseCase,
+                updateVehiculoUseCase,
+                deleteVehiculoUseCase
+        );
+
+
         final AppProperties properties = new AppProperties();
 
         final Connection connection = buildDatabaseConnection(properties);
@@ -92,6 +100,11 @@ public final class DependencyContainer {
                 getUserByIdUseCase,
                 getAllUsersUseCase,
                 loginUseCase);
+
+    }
+
+    public VehiculoController vehiculoController() {
+        return vehiculoController;
     }
 
     public UserController userController() {
