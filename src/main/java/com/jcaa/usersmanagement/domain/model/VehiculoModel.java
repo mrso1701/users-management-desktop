@@ -1,5 +1,6 @@
 package com.jcaa.usersmanagement.domain.model;
 
+import com.jcaa.usersmanagement.domain.exception.VehiculoNoDisponibleException;
 import com.jcaa.usersmanagement.domain.valueobject.ChassisVIN;
 import com.jcaa.usersmanagement.domain.valueobject.Money;
 
@@ -28,7 +29,7 @@ public class VehiculoModel {
 
     public void marcarComoVendido() {
         if ("VENDIDO".equals(this.estado)) {
-            throw new IllegalStateException("El vehículo ya está vendido.");
+            throw new VehiculoNoDisponibleException("El vehículo con VIN " + vin.getValue() + " ya ha sido vendido.");
         }
         this.estado = "VENDIDO";
     }
