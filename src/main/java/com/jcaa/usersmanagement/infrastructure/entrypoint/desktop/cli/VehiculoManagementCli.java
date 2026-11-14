@@ -1,9 +1,8 @@
-package com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.menu;
+package com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli;
 
 import java.util.EnumMap;
 import java.util.Map;
 
-import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.VehiculoResponsePrinter;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.CreateVehiculoHandler;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.DeleteVehiculoHandler;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.FindVehiculoByVinHandler;
@@ -11,11 +10,10 @@ import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.Li
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.OperationHandler;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.handler.UpdateVehiculoEstadoHandler;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.io.ConsoleIO;
+import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.io.VehiculoResponsePrinter;
+import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.menu.VehiculoMenuOption;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.VehiculoController;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 public class VehiculoManagementCli {
     private static final String BANNER = """
             ==============================================
@@ -27,6 +25,13 @@ public class VehiculoManagementCli {
 
     private final VehiculoController vehiculoController;
     private final ConsoleIO console;
+
+    public VehiculoManagementCli(
+            final VehiculoController vehiculoController,
+            final ConsoleIO console) {
+        this.vehiculoController = vehiculoController;
+        this.console = console;
+    }
 
     public void start() {
         console.println(BANNER);

@@ -48,15 +48,25 @@ public final class DependencyContainer {
     private static final String SMTP_PASSWORD = "smtp.password";
     private static final String SMTP_FROM = "smtp.from.address";
     private static final String SMTP_FROM_NAME = "smtp.from.name";
-    private DatabaseConfig connection;
-
     private final VehiculoController vehiculoController;
 
     private final UserController userController;
 
     public DependencyContainer() {
+        final AppProperties properties = new AppProperties();
+        final DatabaseConfig databaseConfig = buildDatabaseConfig(properties);
+
+        
+
+
+        final Connection connection = DatabaseConnectionFactory.createConnection(databaseConfig);
+        final UserRepositoryMySQL userRepository = new UserRepositoryMySQL(connection);
+
         final PostgresVehiculoRepositoryAdapter vehiculoRepository = 
-                new PostgresVehiculoRepositoryAdapter(connection);
+        new PostgresVehiculoRepositoryAdapter(connection);
+        
+        final JavaMailEmailSenderAdapter emailSender = new JavaMailEmailSenderAdapter(buildSmtpConfig(properties));
+        final EmailNotificationService emailNotification = new EmailNotificationService(emailSender);
 
         final CreateVehiculoUseCase createVehiculoUseCase = new CreateVehiculoService(vehiculoRepository, vehiculoRepository);
         final GetVehiculoByVinUseCase getVehiculoByVinUseCase = new GetVehiculoService(vehiculoRepository, vehiculoRepository);
@@ -71,15 +81,6 @@ public final class DependencyContainer {
                 updateVehiculoUseCase,
                 deleteVehiculoUseCase
         );
-
-
-        final AppProperties properties = new AppProperties();
-
-        final Connection connection = buildDatabaseConnection(properties);
-        final UserRepositoryMySQL userRepository = new UserRepositoryMySQL(connection);
-
-        final JavaMailEmailSenderAdapter emailSender = new JavaMailEmailSenderAdapter(buildSmtpConfig(properties));
-        final EmailNotificationService emailNotification = new EmailNotificationService(emailSender);
 
         // Construir Validator para las validaciones en la capa de aplicación
         final Validator validator = ValidatorProvider.buildValidator();
@@ -107,18 +108,18 @@ public final class DependencyContainer {
         return vehiculoController;
     }
 
+
     public UserController userController() {
         return userController;
     }
 
-    private static Connection buildDatabaseConnection(final AppProperties properties) {
-        final DatabaseConfig config = new DatabaseConfig(
+    private static DatabaseConfig buildDatabaseConfig(final AppProperties properties) {
+        return new DatabaseConfig(
                 properties.get(DB_HOST),
                 properties.getInt(DB_PORT),
                 properties.get(DB_NAME),
                 properties.get(DB_USER),
                 properties.get(DB_PASSWORD));
-        return DatabaseConnectionFactory.createConnection(config);
     }
 
     private static SmtpConfig buildSmtpConfig(final AppProperties properties) {

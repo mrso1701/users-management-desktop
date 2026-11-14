@@ -21,7 +21,7 @@ public class VehiculoMapper {
             return null;
         return new VehiculoEntity(
                 domain.getVin().getValue(),
-                "MOD-001",
+                "M001",
                 "Patio Principal",
                 domain.getEstado(),
                 domain.getPrecioBase().getAmount());
