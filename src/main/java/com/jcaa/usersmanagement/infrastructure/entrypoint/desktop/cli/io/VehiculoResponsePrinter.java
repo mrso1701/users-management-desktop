@@ -1,17 +1,20 @@
-package com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli;
+package com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.io;
 
 import java.util.List;
 
-import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.io.ConsoleIO;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.dto.VehiculoResponse;
 
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+
 public class VehiculoResponsePrinter {
     private final ConsoleIO console;
 
-    public void print(final VehiculoResponse vehiculo) {
+    public VehiculoResponsePrinter(final ConsoleIO console) {
+        this.console = console;
+    }
+
+   public void print(final VehiculoResponse vehiculo) {
         console.println("\n--- DETALLE DEL VEHÍCULO ---");
         console.println("VIN: " + vehiculo.vin());
         console.println("Precio: $" + vehiculo.precio() + " " + vehiculo.moneda());

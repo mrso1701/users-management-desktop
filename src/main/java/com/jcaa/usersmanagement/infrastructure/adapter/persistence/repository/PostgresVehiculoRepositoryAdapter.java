@@ -27,22 +27,19 @@ public class PostgresVehiculoRepositoryAdapter implements
         UpdateVehiculoPort,
         DeleteVehiculoPort {
 
-    private final DatabaseConfig config;
+    private final Connection connection;
 
-    public PostgresVehiculoRepositoryAdapter(DatabaseConfig config) {
-        this.config = config;
+    
+    public PostgresVehiculoRepositoryAdapter(final Connection connection) {
+        this.connection = connection;
     }
 
-    private Connection getConnection() {
-        return DatabaseConnectionFactory.createConnection(config);
-    }
 
     @Override
     public VehiculoModel save(VehiculoModel vehiculo) {
         VehiculoEntity entity = VehiculoMapper.toEntity(vehiculo);
         String sql = "INSERT INTO vehiculos (numero_bastidor, id_modelo, ubicacion_actual, estado) VALUES (?, ?, ?, ?)";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+       try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setString(1, entity.getNumeroBastidor());
             stmt.setString(2, entity.getIdModelo());
@@ -62,8 +59,7 @@ public class PostgresVehiculoRepositoryAdapter implements
                 "FROM vehiculos v " +
                 "LEFT JOIN modelos m ON v.id_modelo = m.id_modelo " +
                 "WHERE v.numero_bastidor = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setString(1, vin.getValue());
             try (ResultSet rs = stmt.executeQuery()) {
@@ -90,9 +86,8 @@ public class PostgresVehiculoRepositoryAdapter implements
                 "FROM vehiculos v " +
                 "LEFT JOIN modelos m ON v.id_modelo = m.id_modelo";
 
-        try (Connection conn = getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+        try (Statement stmt = connection.createStatement();
+     ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 VehiculoEntity entity = new VehiculoEntity(
@@ -112,8 +107,7 @@ public class PostgresVehiculoRepositoryAdapter implements
     @Override
     public VehiculoModel update(VehiculoModel vehiculo) {
         String sql = "UPDATE vehiculos SET estado = ? WHERE numero_bastidor = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setString(1, vehiculo.getEstado());
             stmt.setString(2, vehiculo.getVin().getValue());
@@ -128,8 +122,7 @@ public class PostgresVehiculoRepositoryAdapter implements
     @Override
     public boolean deleteByVin(ChassisVIN vin) {
         String sql = "DELETE FROM vehiculos WHERE numero_bastidor = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setString(1, vin.getValue());
             return stmt.executeUpdate() > 0;

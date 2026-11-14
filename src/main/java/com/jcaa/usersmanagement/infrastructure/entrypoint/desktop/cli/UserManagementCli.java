@@ -11,6 +11,7 @@ import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.io.Console
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.io.UserResponsePrinter;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.cli.menu.MenuOption;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.UserController;
+import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.VehiculoController;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,7 @@ public final class UserManagementCli {
   private static final String MENU_BORDER = "  ==========================================";
 
   private final UserController userController;
+  private final VehiculoController vehiculoController;
   private final ConsoleIO console;
 
   public void start() {
@@ -74,7 +76,8 @@ public final class UserManagementCli {
         MenuOption.CREATE_USER, new CreateUserHandler(userController, console, printer),
         MenuOption.UPDATE_USER, new UpdateUserHandler(userController, console, printer),
         MenuOption.DELETE_USER, new DeleteUserHandler(userController, console),
-        MenuOption.LOGIN,       new LoginHandler(userController, console, printer));
+        MenuOption.LOGIN,       new LoginHandler(userController, console, printer),
+        MenuOption.VEHICULOS, () -> new VehiculoManagementCli(vehiculoController, console).start());
   }
 
   private void printMenu() {
